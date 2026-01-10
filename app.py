@@ -45,7 +45,8 @@ def data_metrics():
 
 @app.get("/data/aduana")
 def data_aduana():
-    return jsonify(build_aduana_payload())
+    df = display_cache.get()
+    return jsonify(build_aduana_payload(df, rotate_seconds=5))
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=False)
