@@ -1,4 +1,57 @@
+import pandas as pd
 from typing import Dict, Any
 
-def build_events_payload() -> Dict[str, Any]:
-    return {"rows": []}
+def build_events_payload(df: pd.DataFrame, page_size: int, rotate_seconds: int) -> Dict[str, Any]:
+    df = df.copy()
+
+    # Normalizar nombres de columnas (evita problemas de espacios/mayúsculas)
+    norm = {c: str(c).strip().lower() for c in df.columns}
+    df.rename(columns={old: norm[old] for old in df.columns}, inplace=True)
+
+    # Mapear a nombres canónicos esperados por el frontend
+    # Acepta variantes comunes
+    col_hora = None
+    for c in ["hora", "horario", "time"]:
+        if c in df.columns:
+            col_hora = c
+            break
+
+    col_evento = None
+    for c in ["evento", "event", "actividad"]:
+        if c in df.columns:
+            col_evento = c
+            break
+
+    col_loc = None
+    for c in ["locación", "locacion", "lugar", "location"]:
+        if c in df.columns:
+            col_loc = c
+            break
+
+    # Si faltan, las creamos vacías
+    if col_hora is None:
+        df["hora"] = ""
+        col_hora = "hora"
+    if col_evento is None:
+        df["evento"] = ""
+        col_evento = "evento"
+    if col_loc is None:
+        df["locación"] = ""
+        col_loc = "locación"
+
+    # Armar DF final con nombres exactos que usa el HTML
+    out = pd.DataFrame({
+        "Hora": df[col_hora].fillna("").astype(str),
+        "Evento": df[col_evento].fillna("").astype(str),
+        "Locación": df[col_loc].fillna("").astype(str),
+    })
+
+    # Orden por Hora asc (string)
+    out["_hora_ord"] = out["Hora"].astype(str)
+    out = out.sort_values(by=["_hora_ord"], ascending=[True]).drop(columns=["_hora_ord"])
+
+    return {
+        "rows": out.to_dict(orient="records"),
+        "page_size": page_size,
+        "rotate_seconds": rotate_seconds
+    }

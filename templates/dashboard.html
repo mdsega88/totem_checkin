@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Dashboard Totem SZ328</title>
+  <style>
+    body { margin:0; font-family: Arial, Helvetica, sans-serif; background:#0b1020; color:#e9eefc; }
+    .wrap { padding:16px; }
+    .header {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:10px 12px; margin-bottom:12px;
+      border:1px solid rgba(255,255,255,.12); border-radius:14px;
+      background: rgba(255,255,255,.04);
+    }
+    .title { font-size:18px; letter-spacing:1px; font-weight:800; }
+    .subtitle { font-size:12px; opacity:.8; }
+    .clock { font-size:12px; opacity:.85; }
+
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+
+    .panel {
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      overflow:hidden;
+      background: rgba(255,255,255,.03);
+      min-height: 360px;
+      display:flex; flex-direction:column;
+    }
+
+    .panel-head {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:10px 12px;
+      background: rgba(255,255,255,.06);
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .panel-title { font-size:12px; letter-spacing:1.6px; opacity:.9; font-weight:800; }
+    .panel-kpi { font-size:12px; opacity:.85; }
+    .panel-body { padding:10px 10px 12px; flex:1; }
+
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:8px 8px; border-bottom:1px solid rgba(255,255,255,.08); font-size:13px; text-align:center; }
+    th { font-size:10px; letter-spacing:1.2px; opacity:.8; background: rgba(255,255,255,.04); }
+    tr:last-child td { border-bottom:none; }
+
+    .status-on { color:#9cffc0; font-weight:800; }
+    .status-del { color:#ffd38a; font-weight:800; }
+
+    .selfie {
+      width: 34px; height: 46px; object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      display:inline-block;
+    }
+    .selfie-empty {
+      width: 34px; height: 46px;
+      border-radius: 8px;
+      border: 1px dashed rgba(255,255,255,.18);
+      opacity: .5;
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size: 12px;
+    }
+
+    .banner {
+      margin-bottom:10px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size:12px;
+      opacity:.9;
+      white-space: pre-wrap;
+    }
+    .err { border-color: rgba(255,80,80,.35); background: rgba(255,80,80,.10); }
+
+    /* ✅ Métrica activa (card dentro del panel Métricas) */
+    .metric-card {
+      margin-bottom:10px;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      display:flex; align-items:center; justify-content:center; gap:10px;
+    }
+    .metric-icon { font-size:22px; }
+    .metric-text { text-align:center; }
+    .metric-title { font-size:11px; letter-spacing:1.1px; opacity:.85; font-weight:800; }
+    .metric-value { font-size:16px; font-weight:900; margin-top:2px; }
+    .metric-sub { font-size:11px; opacity:.75; margin-top:2px; }
+
+    @media (max-width: 820px) {
+      .grid { grid-template-columns: 1fr; }
+      .panel { min-height: 300px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div>
+      <div class="title">✈️ SZ328 — TOTEM DASHBOARD</div>
+      <div class="subtitle">Pasajeros · Horarios · Métricas · Aduana</div>
+    </div>
+    <div class="clock" id="clock">—</div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">PASAJEROS</div>
+        <div class="panel-kpi" id="pax_kpi">—</div>
+      </div>
+      <div class="panel-body">
+        <div class="banner" id="pax_banner">Cargando…</div>
+        <table>
+          <thead><tr><th>PASAJERO</th><th>HORA</th><th>MESA</th><th>STATUS</th><th>FOTO</th></tr></thead>
+          <tbody id="pax_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">HORARIOS</div>
+        <div class="panel-kpi" id="evt_kpi">—</div>
+      </div>
+      <div class="panel-body">
+        <div class="banner" id="evt_banner">Cargando…</div>
+        <table>
+          <thead><tr><th>HORA</th><th>EVENTO</th><th>LOCACIÓN</th></tr></thead>
+          <tbody id="evt_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">MÉTRICAS</div>
+        <div class="panel-kpi" id="met_kpi">—</div>
+      </div>
+      <div class="panel-body">
+        <div class="banner" id="met_banner">Cargando…</div>
+
+        <!-- ✅ NUEVO: MÉTRICA ACTIVA (lo que rota en /data/metrics) -->
+        <div class="metric-card" id="met_card" style="display:none;">
+          <div class="metric-icon" id="met_icon">✨</div>
+          <div class="metric-text">
+            <div class="metric-title" id="met_title">MÉTRICA</div>
+            <div class="metric-value" id="met_value">—</div>
+            <div class="metric-sub" id="met_sub"></div>
+          </div>
+        </div>
+
+        <table>
+          <thead><tr><th>MÉTRICA</th><th>VALOR</th></tr></thead>
+          <tbody id="met_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">ADUANA</div>
+        <div class="panel-kpi" id="adu_kpi">—</div>
+      </div>
+      <div class="panel-body">
+        <div class="banner" id="adu_banner">Cargando…</div>
+        <table>
+          <thead><tr><th>PASAJERO</th><th>ESTADO</th></tr></thead>
+          <tbody id="adu_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function setBanner(id, msg, isErr=false) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = isErr ? "banner err" : "banner";
+}
+function asArray(x) { return Array.isArray(x) ? x : []; }
+
+function tickClock() {
+  const d = new Date();
+  const hh = String(d.getHours()).padStart(2,'0');
+  const mm = String(d.getMinutes()).padStart(2,'0');
+  const ss = String(d.getSeconds()).padStart(2,'0');
+  document.getElementById("clock").textContent = `${hh}:${mm}:${ss}`;
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+// ---------------- PASAJEROS ----------------
+let paxRows = [], paxPage = 0, paxPageSize = 10;
+
+function renderPassengers() {
+  const tbody = document.getElementById("pax_tbody");
+  tbody.innerHTML = "";
+
+  const start = paxPage * paxPageSize;
+  const slice = paxRows.slice(start, start + paxPageSize);
+
+  slice.forEach(r => {
+    const tr = document.createElement("tr");
+
+    ["Pasajero","Hora","Mesa","Checkin"].forEach(k => {
+      const td = document.createElement("td");
+      const v = (r[k] ?? "").toString();
+      if (k === "Checkin") {
+        if (v === "ON TIME") td.className = "status-on";
+        else if (v === "DELAYED") td.className = "status-del";
+      }
+      td.textContent = v;
+      tr.appendChild(td);
+    });
+
+    const tdSelfie = document.createElement("td");
+    const url = (r["Selfie Aduana"] ?? "").toString().trim();
+    if (url) {
+      const img = document.createElement("img");
+      img.className = "selfie";
+      img.src = url;
+      img.loading = "lazy";
+      img.referrerPolicy = "no-referrer";
+      img.onerror = () => {
+        tdSelfie.innerHTML = "";
+        const ph = document.createElement("div");
+        ph.className = "selfie-empty";
+        ph.textContent = "—";
+        tdSelfie.appendChild(ph);
+      };
+      tdSelfie.appendChild(img);
+    } else {
+      const ph = document.createElement("div");
+      ph.className = "selfie-empty";
+      ph.textContent = "—";
+      tdSelfie.appendChild(ph);
+    }
+    tr.appendChild(tdSelfie);
+
+    tbody.appendChild(tr);
+  });
+
+  const total = paxRows.length;
+  const ontime = paxRows.filter(r => r["Checkin"] === "ON TIME").length;
+  document.getElementById("pax_kpi").textContent = `TOTAL ${total} · ON TIME ${ontime}`;
+  setBanner("pax_banner", total ? "OK ✅" : "Sin pasajeros.");
+}
+
+async function fetchPassengers() {
+  try {
+    const res = await fetch("/data/passengers", { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    paxRows = asArray(json.rows);
+    paxPageSize = json.page_size || paxPageSize;
+    const maxPage = Math.max(0, Math.ceil(paxRows.length / paxPageSize) - 1);
+    if (paxPage > maxPage) paxPage = 0;
+    renderPassengers();
+  } catch (e) {
+    setBanner("pax_banner", "Error /data/passengers:\n" + e, true);
+  }
+}
+
+function rotatePassengers() {
+  const maxPage = Math.max(0, Math.ceil(paxRows.length / paxPageSize) - 1);
+  paxPage = maxPage === 0 ? 0 : (paxPage >= maxPage ? 0 : paxPage + 1);
+  renderPassengers();
+}
+
+// ---------------- HORARIOS ----------------
+let evtRows = [], evtPage = 0, evtPageSize = 10;
+
+function renderEvents() {
+  const tbody = document.getElementById("evt_tbody");
+  tbody.innerHTML = "";
+
+  const start = evtPage * evtPageSize;
+  const slice = evtRows.slice(start, start + evtPageSize);
+
+  slice.forEach(r => {
+    const tr = document.createElement("tr");
+    ["Hora","Evento","Locación"].forEach(k => {
+      const td = document.createElement("td");
+      td.textContent = (r[k] ?? "").toString();
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("evt_kpi").textContent = `TOTAL ${evtRows.length}`;
+  setBanner("evt_banner", evtRows.length ? "OK ✅" : "Sin horarios cargados.");
+}
+
+async function fetchEvents() {
+  try {
+    const res = await fetch("/data/events", { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    evtRows = asArray(json.rows);
+    evtPageSize = json.page_size || evtPageSize;
+    const maxPage = Math.max(0, Math.ceil(evtRows.length / evtPageSize) - 1);
+    if (evtPage > maxPage) evtPage = 0;
+    renderEvents();
+  } catch (e) {
+    setBanner("evt_banner", "Error /data/events:\n" + e, true);
+  }
+}
+
+function rotateEvents() {
+  const maxPage = Math.max(0, Math.ceil(evtRows.length / evtPageSize) - 1);
+  evtPage = maxPage === 0 ? 0 : (evtPage >= maxPage ? 0 : evtPage + 1);
+  renderEvents();
+}
+
+// ---------------- MÉTRICAS ----------------
+async function fetchMetrics() {
+  try {
+    const res = await fetch("/data/metrics", { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+
+    // ✅ Mostrar la métrica activa (la que rota)
+    const active = json.active_metric;
+    if (active) {
+      document.getElementById("met_card").style.display = "flex";
+      document.getElementById("met_icon").textContent = active.icon || "✨";
+      document.getElementById("met_title").textContent = (active.title || "MÉTRICA").toUpperCase();
+      document.getElementById("met_value").textContent = active.value || "—";
+      document.getElementById("met_sub").textContent = active.subtitle || "";
+    }
+
+    // ✅ Tabla: mostramos el listado completo (json.all)
+    const rows = asArray(json.all);
+    const tbody = document.getElementById("met_tbody");
+    tbody.innerHTML = "";
+
+    rows.slice(0, 12).forEach(r => {
+      const tr = document.createElement("tr");
+      const tdA = document.createElement("td");
+      const tdB = document.createElement("td");
+      tdA.textContent = `${(r.icon ?? "")} ${(r.title ?? "")}`.trim();
+      tdB.textContent = (r.value ?? "").toString();
+      tr.appendChild(tdA); tr.appendChild(tdB);
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById("met_kpi").textContent = rows.length ? `TOTAL ${rows.length}` : "PENDIENTE";
+    setBanner("met_banner", rows.length ? "OK ✅" : "Sin métricas (revisar backend).");
+  } catch (e) {
+    setBanner("met_banner", "Error /data/metrics:\n" + e, true);
+  }
+}
+
+// ---------------- ADUANA ----------------
+async function fetchAduana() {
+  try {
+    const res = await fetch("/data/aduana", { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+
+    const rows = asArray(json.rows ?? json);
+    const tbody = document.getElementById("adu_tbody");
+    tbody.innerHTML = "";
+
+    rows.slice(0, 12).forEach(r => {
+      const tr = document.createElement("tr");
+      const tdA = document.createElement("td");
+      const tdB = document.createElement("td");
+      tdA.textContent = (r["Pasajero"] ?? r["Nombre"] ?? "").toString();
+      tdB.textContent = (r["Estado"] ?? r["Status"] ?? "").toString();
+      tr.appendChild(tdA); tr.appendChild(tdB);
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById("adu_kpi").textContent = rows.length ? `TOTAL ${rows.length}` : "PENDIENTE";
+    setBanner("adu_banner", rows.length ? "OK ✅" : "Aduana todavía sin filas (OK).");
+  } catch (e) {
+    setBanner("adu_banner", "Error /data/aduana:\n" + e, true);
+  }
+}
+
+// Start loops
+fetchPassengers();
+fetchEvents();
+fetchMetrics();
+fetchAduana();
+
+setInterval(fetchPassengers, 5000);
+setInterval(fetchEvents, 5000);
+setInterval(fetchMetrics, 4000);  // refresca seguido; el backend rota cada 12s
+setInterval(fetchAduana, 7000);
+
+setInterval(rotatePassengers, 5000);
+setInterval(rotateEvents, 6000);
+</script>
+</body>
+</html>
