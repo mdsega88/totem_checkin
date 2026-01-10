@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Flight Board SZ328</title>
+  <style>
+    body { margin:0; font-family: Arial, Helvetica, sans-serif; background:#0b1020; color:#e9eefc; }
+    .wrap { padding:24px; }
+    .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+    .title { font-size:28px; letter-spacing:1px; }
+    .subtitle { font-size:14px; opacity:.8; }
+    .kpis { display:flex; gap:18px; font-size:14px; }
+    .card { border:1px solid rgba(255,255,255,.12); border-radius:16px; overflow:hidden; }
+    table { width:100%; border-collapse:collapse; }
+    thead { background: rgba(255,255,255,.06); }
+    th, td { padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.10); font-size:18px; text-align:center; }
+    th { font-size:12px; letter-spacing:1.5px; opacity:.85; }
+    tr:last-child td { border-bottom:none; }
+    .status-on { color:#9cffc0; font-weight:800; }
+    .status-del { color:#ffd38a; font-weight:800; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="title">✈️ VUELO SZ328 — BOARDING</div>
+      <div class="subtitle">Pantalla de embarque</div>
+    </div>
+    <div class="kpis">
+      <div id="k1">PASAJEROS: —</div>
+      <div id="k2">ON TIME: —</div>
+      <div id="k3">EN VIVO</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>PASAJERO</th>
+          <th>HORA CHECKIN</th>
+          <th>MESA</th>
+          <th>STATUS</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+let rows = [];
+let pageSize = 10;
+let rotateSeconds = 5;
+let page = 0;
+
+function render() {
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  const start = page * pageSize;
+  const slice = rows.slice(start, start + pageSize);
+
+  slice.forEach(r => {
+    const tr = document.createElement("tr");
+
+    ["Pasajero", "Hora", "Mesa", "Checkin"].forEach(k => {
+      const td = document.createElement("td");
+      const v = (r[k] ?? "").toString();
+
+      if (k === "Checkin") {
+        if (v === "ON TIME") td.className = "status-on";
+        else if (v === "DELAYED") td.className = "status-del";
+      }
+
+      td.textContent = v;
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+
+  const total = rows.length;
+  const ontime = rows.filter(r => r["Checkin"] === "ON TIME").length;
+  document.getElementById("k1").textContent = `PASAJEROS: ${total}`;
+  document.getElementById("k2").textContent = `ON TIME: ${ontime}`;
+}
+
+async function fetchData() {
+  const res = await fetch("/data/passengers", { cache: "no-store" });
+  const json = await res.json();
+  rows = json.rows || [];
+  pageSize = json.page_size || pageSize;
+  rotateSeconds = json.rotate_seconds || rotateSeconds;
+
+  const maxPage = Math.max(0, Math.ceil(rows.length / pageSize) - 1);
+  if (page > maxPage) page = 0;
+
+  render();
+}
+
+function rotatePage() {
+  const maxPage = Math.max(0, Math.ceil(rows.length / pageSize) - 1);
+  page = maxPage === 0 ? 0 : (page >= maxPage ? 0 : page + 1);
+  render();
+}
+
+fetchData();
+setInterval(fetchData, 5000);
+setInterval(rotatePage, rotateSeconds * 1000);
+</script>
+</body>
+</html>
