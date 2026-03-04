@@ -16,14 +16,19 @@ def build_passengers_payload(
 
     df = df.copy()
 
-    # Orden: ON TIME arriba, luego por Hora desc (string)
-    df["_estado_ord"] = (df["Checkin"] != "ON TIME").astype(int)
-    df["_hora_ord"] = df["Hora"].astype(str)
+    # Transform names: "SURNAME(S) NAME" -> "SURNAME(S), NAME"
+    # User confirmed input is "SURNAME... NAME"
+    def format_name(val):
+        val = str(val).strip().upper()
+        parts = val.rsplit(" ", 1)
+        if len(parts) > 1:
+            return f"{parts[0]}, {parts[1]}"
+        return val
 
-    df = df.sort_values(
-        by=["_estado_ord", "_hora_ord"],
-        ascending=[True, False]
-    )
+    df["Pasajero"] = df["Pasajero"].apply(format_name)
+
+    # Sort alphabetically by name
+    df = df.sort_values(by=["Pasajero"], ascending=[True])
 
     # Orden final de columnas (Selfie incluida pero no visible si no se usa)
     df = df[

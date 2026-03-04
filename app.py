@@ -39,8 +39,13 @@ def data_events():
 
 @app.get("/data/metrics")
 def data_metrics():
-    df = display_cache.get()
-    return jsonify(build_metrics_payload(df, rotate_seconds=12))
+    try:
+        df = display_cache.get()
+        df_events = events_cache.get()
+        return jsonify(build_metrics_payload(df, df_events, rotate_seconds=12))
+    except Exception as e:
+        import traceback
+        return jsonify({"error": str(e), "traceback": traceback.format_exc()}), 500
 
 
 @app.get("/data/aduana")
@@ -48,5 +53,16 @@ def data_aduana():
     df = display_cache.get()
     return jsonify(build_aduana_payload(df, rotate_seconds=5))
 
+from modules.weather import WeatherService
+
+# Coordenadas Villa de Mayo
+weather_service = WeatherService(lat=-34.50, lon=-58.68)
+
+@app.get("/data/weather")
+def data_weather():
+    return jsonify(weather_service.get_current())
+
 if __name__ == "__main__":
+    import webbrowser
+    webbrowser.open("http://127.0.0.1:5000/dashboard")
     app.run(host="127.0.0.1", port=5000, debug=False)
