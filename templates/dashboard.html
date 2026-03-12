@@ -11,18 +11,25 @@
       font-family: Arial, Helvetica, sans-serif;
       background: #001a38;
       color: #fffcf4;
+      height: 100vh;
+      overflow: hidden;
     }
 
     .wrap {
-      padding: 16px;
+      padding: 12px;
+      height: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 12px;
-      margin-bottom: 12px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      flex-shrink: 0;
       border: 1px solid rgba(255, 252, 244, .12);
       border-radius: 14px;
       background: rgba(255, 252, 244, .04);
@@ -71,19 +78,23 @@
     }
 
     .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      min-height: 0;
+      /* Important for flex children scrolling/shrinking */
     }
 
     .panel {
       border: 1px solid rgba(255, 252, 244, .12);
-      border-radius: 16px;
+      border-radius: 12px;
       overflow: hidden;
       background: rgba(255, 252, 244, .03);
-      min-height: 360px;
       display: flex;
       flex-direction: column;
+      flex: 1;
+      min-height: 0;
     }
 
     .panel-head {
@@ -100,6 +111,18 @@
       letter-spacing: 1.6px;
       opacity: .9;
       font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #9cffc0;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #9cffc0;
+      animation: pulse 2s ease-in-out infinite;
     }
 
     .panel-kpi {
@@ -108,35 +131,112 @@
     }
 
     .panel-body {
-      padding: 10px 10px 12px;
+      padding: 8px 10px;
       flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    thead {
+      flex-shrink: 0;
+    }
+
+    tbody {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    tr {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 252, 244, .08);
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+    }
+
+    thead tr {
+      flex: 0 0 auto;
+      height: auto;
+      min-height: 3vh;
     }
 
     th,
     td {
-      padding: 8px 8px;
-      border-bottom: 1px solid rgba(255, 252, 244, .08);
-      font-size: 13px;
+      flex: 1;
+      padding: 2px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.0vh;
       text-align: center;
+      overflow: hidden;
+      height: 100%;
+      box-sizing: border-box;
     }
 
     th {
-      font-size: 10px;
-      letter-spacing: 1.2px;
-      opacity: .8;
-      background: rgba(255, 252, 244, .04);
+      font-size: 0.9vh;
+      letter-spacing: 0.8px;
+      opacity: .7;
+      background: rgba(255, 252, 244, .06);
+      font-weight: 800;
+      text-transform: uppercase;
     }
 
-    tr:last-child td {
-      border-bottom: none;
+    /* Column widths */
+    th:nth-child(1),
+    td:nth-child(1) {
+      flex: 0 0 15%;
     }
 
-    /* Make passenger table bold */
+    /* Aerolinea */
+    th:nth-child(2),
+    td:nth-child(2) {
+      flex: 1;
+      justify-content: flex-start;
+      text-align: left;
+      padding-left: 10px;
+    }
+
+    /* Pasajero */
+    th:nth-child(3),
+    td:nth-child(3) {
+      flex: 0 0 10%;
+    }
+
+    /* Hora */
+    th:nth-child(4),
+    td:nth-child(4) {
+      flex: 0 0 10%;
+    }
+
+    /* Mesa */
+    th:nth-child(5),
+    td:nth-child(5) {
+      flex: 0 0 15%;
+    }
+
+    /* Status */
+    th:nth-child(6),
+    td:nth-child(6) {
+      flex: 0 0 8%;
+    }
+
+    /* Foto */
+
     #pax_tbody td {
       font-weight: 800;
       text-transform: uppercase;
@@ -175,14 +275,15 @@
     }
 
     .banner {
-      margin-bottom: 10px;
-      padding: 8px 10px;
-      border-radius: 12px;
+      margin-bottom: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
       border: 1px solid rgba(255, 252, 244, .12);
       background: rgba(255, 252, 244, .04);
-      font-size: 12px;
+      font-size: 11px;
       opacity: .9;
       white-space: pre-wrap;
+      flex-shrink: 0;
     }
 
     .err {
@@ -190,17 +291,27 @@
       background: rgba(255, 80, 80, .10);
     }
 
-    /* ✅ Métrica activa (card dentro del panel Métricas) - solo dinámicas */
+    /* ✅ Métricas compactas */
+    #met_fixed {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
     .metric-card {
-      margin-bottom: 15px;
-      padding: 10px 10px;
-      border-radius: 12px;
+      position: relative;
+      /* Para contener el contador absoluto */
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 10px;
       border: 1px solid rgba(255, 252, 244, .12);
       background: rgba(255, 252, 244, .04);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
+      flex-shrink: 0;
     }
 
     .metric-icon {
@@ -212,60 +323,61 @@
     }
 
     .metric-title {
-      font-size: 11px;
-      letter-spacing: 1.1px;
+      font-size: 1.0vh;
+      letter-spacing: 1px;
       opacity: .85;
       font-weight: 800;
     }
 
     .metric-value {
-      font-size: 16px;
+      font-size: 1.5vh;
       font-weight: 900;
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     .metric-sub {
-      font-size: 11px;
+      font-size: 1.0vh;
       opacity: .75;
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
-    /* ✅ Métricas fijas */
     .fixed-metric {
-      margin-bottom: 12px;
-      padding: 10px 12px;
-      border-radius: 10px;
+      padding: 6px 8px;
+      border-radius: 8px;
       border: 1px solid rgba(255, 252, 244, .12);
       background: rgba(255, 252, 244, .04);
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .fixed-metric-title {
-      font-size: 10px;
-      letter-spacing: 1px;
+      font-size: 0.9vh;
+      letter-spacing: 0.8px;
       opacity: .8;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
     }
 
     .fixed-metric-value {
-      font-size: 14px;
+      font-size: 1.2vh;
       font-weight: 800;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .fixed-metric-sub {
-      font-size: 10px;
+      font-size: 0.9vh;
       opacity: .7;
     }
 
     .progress-bar-container {
       width: 100%;
-      height: 8px;
+      height: 4px;
       background: rgba(255, 252, 244, .1);
-      border-radius: 4px;
+      border-radius: 2px;
       overflow: hidden;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .progress-bar-fill {
@@ -279,17 +391,28 @@
     .wanted-card {
       display: none;
       flex-direction: column;
-      padding: 20px 25px;
-      min-height: 360px;
+      padding: 1vh 2vh;
+      height: 100%;
+      box-sizing: border-box;
       position: relative;
       background: #5a1a1a;
+      /* RED for Interpol */
       background-image:
         radial-gradient(circle at 20% 30%, rgba(0, 0, 0, .2) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(0, 0, 0, .15) 0%, transparent 50%),
-        repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, .05) 1px, rgba(0, 0, 0, .05) 2px);
-      border-radius: 12px;
+        radial-gradient(circle at 80% 70%, rgba(0, 0, 0, .15) 0%, transparent 50%);
+      border-radius: 8px;
       border: 1px solid rgba(255, 252, 244, .12);
       overflow: hidden;
+      justify-content: center;
+    }
+
+    .wanted-card.captain-card {
+      background: #001a38;
+      /* BLUE for Captains */
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, .05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, .02) 0%, transparent 50%);
+      border-color: rgba(255, 252, 244, .2);
     }
 
     .wanted-card.active {
@@ -300,8 +423,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 15px;
-      margin-bottom: 25px;
+      gap: 12px;
+      margin-bottom: 0.5vh;
     }
 
     .wanted-logo {
@@ -317,9 +440,9 @@
     }
 
     .wanted-main-title {
-      font-size: 36px;
+      font-size: 2.5vh;
       font-weight: 900;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       color: #fff;
       text-transform: uppercase;
       font-family: Arial, sans-serif;
@@ -339,11 +462,12 @@
     }
 
     .wanted-photo {
-      width: 160px;
-      height: 200px;
+      width: 12vh;
+      height: 16vh;
       object-fit: cover;
       display: block;
       background: #E6F3FF;
+      border: 2px solid #fff;
     }
 
     .wanted-photo-placeholder {
@@ -363,21 +487,21 @@
     }
 
     .wanted-name {
-      font-size: 24px;
+      font-size: 18px;
       font-weight: 900;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
 
     .wanted-divider {
       height: 1px;
-      background: rgba(255, 252, 244, .6);
-      margin: 10px 0;
+      background: rgba(255, 252, 244, .3);
+      margin: 14px 0;
     }
 
     .wanted-detail {
-      margin: 8px 0;
+      margin: 12px 0;
       font-size: 13px;
     }
 
@@ -391,10 +515,10 @@
     }
 
     .wanted-footer {
-      margin-top: 20px;
-      font-size: 11px;
+      margin-top: 10px;
+      font-size: 9px;
       color: rgba(255, 252, 244, .9);
-      line-height: 1.6;
+      line-height: 1.4;
       text-align: left;
     }
 
@@ -422,7 +546,7 @@
       <!-- 2. Title (Center) -->
       <div style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); text-align:center;">
         <div class="title">✈️ VUELO SZ2803 — INFORMACIÓN AL PASAJERO</div>
-        <div class="subtitle">Pasajeros · Horarios · Métricas · Aduana</div>
+        <div class="subtitle">Pasajeros · Métricas · Aduana</div>
       </div>
 
       <!-- 3. Weather (Right) -->
@@ -444,13 +568,12 @@
     </div>
 
     <div class="grid">
-      <div class="panel">
+      <div class="panel" style="flex: 2;">
         <div class="panel-head">
-          <div class="panel-title">PASAJEROS</div>
+          <div class="panel-title"><span class="status-dot"></span> PASAJEROS</div>
           <div class="panel-kpi" id="pax_kpi">—</div>
         </div>
         <div class="panel-body">
-          <div class="banner" id="pax_banner">Cargando…</div>
           <table>
             <thead>
               <tr>
@@ -467,36 +590,29 @@
         </div>
       </div>
 
-      <div class="panel">
+
+      <div class="panel" style="flex: 2;">
         <div class="panel-head">
-          <div class="panel-title">HORARIOS</div>
-          <div class="panel-kpi" id="evt_kpi">—</div>
+          <div class="panel-title"><span class="status-dot"></span> ADUANA</div>
+          <div class="panel-kpi" id="adu_kpi">—</div>
         </div>
         <div class="panel-body">
-          <div class="banner" id="evt_banner">Cargando…</div>
-          <table>
-            <thead>
-              <tr>
-                <th>HORA</th>
-                <th>EVENTO</th>
-                <th>LOCACIÓN</th>
-              </tr>
-            </thead>
-            <tbody id="evt_tbody"></tbody>
-          </table>
+          <div id="adu_container"></div>
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" style="flex: 1.5;">
         <div class="panel-head">
-          <div class="panel-title">MÉTRICAS</div>
+          <div class="panel-title"><span class="status-dot"></span> MÉTRICAS</div>
           <div class="panel-kpi" id="met_kpi">—</div>
         </div>
         <div class="panel-body">
-          <div class="banner" id="met_banner">Cargando…</div>
 
           <!-- ✅ Métricas fijas -->
           <div id="met_fixed"></div>
+
+          <!-- ✅ Último Check-in (Full Width) -->
+          <div id="met_last_checkin"></div>
 
           <!-- ✅ MÉTRICA DINÁMICA (lo que rota en /data/metrics) -->
           <div class="metric-card" id="met_card" style="display:none;">
@@ -506,18 +622,9 @@
               <div class="metric-value" id="met_value">—</div>
               <div class="metric-sub" id="met_sub"></div>
             </div>
+            <div id="met_counter"
+              style="position:absolute; bottom:5px; right:10px; font-size:0.8vh; opacity:0.5; font-weight:800;"></div>
           </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head">
-          <div class="panel-title">ADUANA</div>
-          <div class="panel-kpi" id="adu_kpi">—</div>
-        </div>
-        <div class="panel-body">
-          <div class="banner" id="adu_banner">Cargando…</div>
-          <div id="adu_container"></div>
         </div>
       </div>
     </div>
@@ -525,9 +632,7 @@
 
   <script>
     function setBanner(id, msg, isErr = false) {
-      const el = document.getElementById(id);
-      el.textContent = msg;
-      el.className = isErr ? "banner err" : "banner";
+      // Banners removed from UI, function simplified
     }
     function asArray(x) { return Array.isArray(x) ? x : []; }
 
@@ -543,13 +648,20 @@
     // ---------------- PASAJEROS ----------------
     let paxRows = [];
     let paxPage = 0;
-    let paxPageSize = 8;
+    let paxPageSize = 5; // Valor por defecto, se ajustará dinámicamente o por config
 
     function renderPassengers() {
       const tbody = document.getElementById("pax_tbody");
       tbody.innerHTML = "";
 
-      const start = paxPage * paxPageSize;
+      let start = paxPage * paxPageSize;
+
+      // LOGICA ESPECIAL: Si es la última página y no está completa, retrocedemos 
+      // para mostrar siempre paxPageSize elementos (si hay suficientes)
+      if (start + paxPageSize > paxRows.length && paxRows.length > paxPageSize) {
+        start = paxRows.length - paxPageSize;
+      }
+
       const slice = paxRows.slice(start, start + paxPageSize);
 
       slice.forEach(r => {
@@ -559,7 +671,7 @@
         const tdAir = document.createElement("td");
         const imgAir = document.createElement("img");
         imgAir.src = "/static/LOGO%20BODA%20HORIZONTAL.png";
-        imgAir.style.height = "55px";
+        imgAir.style.height = "2vh";
         imgAir.style.width = "auto";
         imgAir.style.display = "block";
         imgAir.style.margin = "0 auto";
@@ -581,23 +693,21 @@
         const url = (r["Selfie Aduana"] ?? "").toString().trim();
         if (url) {
           const img = document.createElement("img");
-          img.className = "selfie";
+          img.style.height = "3vh";
+          img.style.width = "auto";
+          img.style.aspectRatio = "3/4";
+          img.style.objectFit = "cover";
+          img.style.borderRadius = "4px";
+          img.style.border = "1px solid rgba(255, 252, 244, .18)";
           img.src = url;
           img.loading = "lazy";
           img.referrerPolicy = "no-referrer";
           img.onerror = () => {
-            tdSelfie.innerHTML = "";
-            const ph = document.createElement("div");
-            ph.className = "selfie-empty";
-            ph.textContent = "—";
-            tdSelfie.appendChild(ph);
+            tdSelfie.innerHTML = "—";
           };
           tdSelfie.appendChild(img);
         } else {
-          const ph = document.createElement("div");
-          ph.className = "selfie-empty";
-          ph.textContent = "—";
-          tdSelfie.appendChild(ph);
+          tdSelfie.textContent = "—";
         }
         tr.appendChild(tdSelfie);
 
@@ -631,113 +741,60 @@
       renderPassengers();
     }
 
-    // ---------------- HORARIOS ----------------
-    let evtRows = [], evtPage = 0, evtPageSize = 10;
-
-    function renderEvents() {
-      const tbody = document.getElementById("evt_tbody");
-      tbody.innerHTML = "";
-
-      const start = evtPage * evtPageSize;
-      const slice = evtRows.slice(start, start + evtPageSize);
-
-      slice.forEach(r => {
-        const tr = document.createElement("tr");
-        ["Hora", "Evento", "Locación"].forEach(k => {
-          const td = document.createElement("td");
-          td.textContent = (r[k] ?? "").toString();
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById("evt_kpi").textContent = `TOTAL ${evtRows.length}`;
-      setBanner("evt_banner", evtRows.length ? "OK ✅" : "Sin horarios cargados.");
-    }
-
-    async function fetchEvents() {
-      try {
-        const res = await fetch("/data/events", { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        evtRows = asArray(json.rows);
-        evtPageSize = json.page_size || evtPageSize;
-        const maxPage = Math.max(0, Math.ceil(evtRows.length / evtPageSize) - 1);
-        if (evtPage > maxPage) evtPage = 0;
-        renderEvents();
-      } catch (e) {
-        setBanner("evt_banner", "Error /data/events:\n" + e, true);
-      }
-    }
-
-    function rotateEvents() {
-      const maxPage = Math.max(0, Math.ceil(evtRows.length / evtPageSize) - 1);
-      evtPage = maxPage === 0 ? 0 : (evtPage >= maxPage ? 0 : evtPage + 1);
-      renderEvents();
-    }
 
     // ---------------- MÉTRICAS ----------------
     function renderFixedMetrics(fixed) {
+      // 1) Contenedor de métricas fijas apiladas
       const container = document.getElementById("met_fixed");
       container.innerHTML = "";
 
-      // 1) Embarque completado
+      // 1.a) Completitud de Embarque
       const embarque = fixed.embarque_completado || {};
       const embarqueDiv = document.createElement("div");
       embarqueDiv.className = "fixed-metric";
+      embarqueDiv.style.padding = "10px";
       embarqueDiv.innerHTML = `
-    <div class="fixed-metric-title">EMBARQUE COMPLETADO</div>
-    <div class="fixed-metric-value">${embarque.porcentaje || 0}%</div>
-    <div class="fixed-metric-sub">${embarque.completados || 0} / ${embarque.total || 0} invitados</div>
-    <div class="progress-bar-container">
-      <div class="progress-bar-fill" style="width: ${embarque.porcentaje || 0}%"></div>
-    </div>
-  `;
+        <div class="fixed-metric-title">% COMPLETITUD EMBARQUE</div>
+        <div class="fixed-metric-value">${embarque.porcentaje || 0}%</div>
+        <div class="fixed-metric-sub" style="color: ${embarque.status_color || '#fff'}; font-weight: 900; font-size: 1.1vh; text-transform: uppercase;">
+          ${embarque.status_text || ""}
+        </div>
+        <div class="progress-bar-container" style="height: 10px; margin-top: 8px;">
+          <div class="progress-bar-fill" style="width: ${embarque.porcentaje || 0}%; background: ${embarque.status_color || '#16A34A'}; shadow: 0 0 10px ${embarque.status_color || '#16A34A'}; transition: all 1s ease;"></div>
+        </div>
+      `;
       container.appendChild(embarqueDiv);
 
-      // 2) Ritmo de embarque
+      // 1.b) Ritmo de embarque
       const ritmo = fixed.ritmo_embarque || {};
       const ritmoDiv = document.createElement("div");
       ritmoDiv.className = "fixed-metric";
       ritmoDiv.innerHTML = `
-    <div class="fixed-metric-title">RITMO DE EMBARQUE</div>
-    <div class="fixed-metric-value">${ritmo.promedio_texto || "N/D"}</div>
-    <div class="fixed-metric-sub">Promedio entre checkins</div>
-  `;
+        <div class="fixed-metric-title">RITMO DE EMBARQUE REAL</div>
+        <div class="fixed-metric-value" style="font-size: 1.4vh;">${ritmo.promedio_texto || "N/D"}</div>
+        <div class="fixed-metric-sub">Promedio entre checkins</div>
+      `;
       container.appendChild(ritmoDiv);
 
-      // 3) Viaje Actual
-      const viaje = fixed.viaje_actual || {};
-      const viajeDiv = document.createElement("div");
-      viajeDiv.className = "fixed-metric";
-      viajeDiv.innerHTML = `
-    <div class="fixed-metric-title">VIAJE ACTUAL</div>
-    <div class="fixed-metric-value">${viaje.evento || "N/D"}</div>
-    <div class="fixed-metric-sub">${viaje.hora || ""}</div>
-  `;
-      container.appendChild(viajeDiv);
+      // 2) Último Check-in (ANCHO COMPLETO - estilo metric-card)
+      const lastCheckinContainer = document.getElementById("met_last_checkin");
+      lastCheckinContainer.innerHTML = "";
 
-      // 4) Próxima Escala
-      const proxima = fixed.proxima_escala || {};
-      const proximaDiv = document.createElement("div");
-      proximaDiv.className = "fixed-metric";
-      proximaDiv.innerHTML = `
-    <div class="fixed-metric-title">PRÓXIMA ESCALA</div>
-    <div class="fixed-metric-value">${proxima.evento || "N/D"}</div>
-    <div class="fixed-metric-sub">${proxima.hora || ""}</div>
-  `;
-      container.appendChild(proximaDiv);
-
-      // 5) Último Check-in
       const ultimo = fixed.ultimo_checkin || {};
       const ultimoDiv = document.createElement("div");
-      ultimoDiv.className = "fixed-metric";
+      ultimoDiv.className = "metric-card"; // Estilo igual al de las rotativas
+      ultimoDiv.style.display = "flex";
+      ultimoDiv.style.marginTop = "10px";
+      ultimoDiv.style.background = "rgba(255, 252, 244, .08)"; // Un pelín más claro para destacar
       ultimoDiv.innerHTML = `
-    <div class="fixed-metric-title">ÚLTIMO CHECK-IN</div>
-    <div class="fixed-metric-value">${ultimo.nombre || "N/D"}</div>
-    <div class="fixed-metric-sub">${ultimo.hora || ""}</div>
-  `;
-      container.appendChild(ultimoDiv);
+        <div class="metric-icon">🕒</div>
+        <div class="metric-text">
+          <div class="metric-title">ÚLTIMO CHECK-IN</div>
+          <div class="metric-value" style="font-size: 1.6vh;">${ultimo.nombre || "N/D"}</div>
+          <div class="metric-sub">${ultimo.hora || ""}</div>
+        </div>
+      `;
+      lastCheckinContainer.appendChild(ultimoDiv);
     }
 
     async function fetchMetrics() {
@@ -753,117 +810,155 @@
 
         // ✅ Mostrar la métrica dinámica activa (la que rota)
         const active = json.active_metric;
+        const allDynamic = json.dynamic_metrics || [];
+        const dynamicCount = allDynamic.length;
+
         if (active) {
           document.getElementById("met_card").style.display = "flex";
           document.getElementById("met_icon").textContent = active.icon || "✨";
           document.getElementById("met_title").textContent = (active.title || "MÉTRICA").toUpperCase();
           document.getElementById("met_value").textContent = active.value || "—";
           document.getElementById("met_sub").textContent = active.subtitle || "";
+
+          // Encontrar posición actual
+          const currentIdx = allDynamic.findIndex(m => m.title === active.title && m.value === active.value);
+          if (currentIdx !== -1) {
+            document.getElementById("met_counter").textContent = `${currentIdx + 1} / ${dynamicCount}`;
+          }
         } else {
           document.getElementById("met_card").style.display = "none";
         }
 
-        const dynamicCount = (json.dynamic_metrics || []).length;
-        document.getElementById("met_kpi").textContent = dynamicCount ? `${dynamicCount} métricas dinámicas` : "PENDIENTE";
+        document.getElementById("met_kpi").textContent = dynamicCount ? `${dynamicCount} DATOS EN ROTACIÓN` : "PENDIENTE";
         setBanner("met_banner", json.fixed_metrics ? "OK ✅" : "Sin métricas (revisar backend).");
       } catch (e) {
         setBanner("met_banner", "Error /data/metrics:\n" + e, true);
       }
     }
 
-    // ---------------- ADUANA ----------------
-    let aduRows = [], aduCurrentIndex = 0, aduRotateSeconds = 5;
+    // ---------------- ADUANA / CAPITANES ----------------
+    let aduData = { aduana: [], capitanes: [] };
+    let aduMode = "wanted"; // "wanted" o "capitanes"
+    let aduIdx = 0;
+    let capIdx = 0;
+
+    function switchAduanaMode() {
+      if (aduMode === "wanted" && aduData.capitanes.length > 0) {
+        aduMode = "capitanes";
+      } else {
+        aduMode = "wanted";
+      }
+      aduIdx = 0;
+      capIdx = 0;
+      renderAduana();
+    }
+    // Rotar modo cada 30 segundos
+    setInterval(switchAduanaMode, 30000);
 
     function renderAduana() {
       const container = document.getElementById("adu_container");
       container.innerHTML = "";
 
-      if (aduRows.length === 0) {
-        setBanner("adu_banner", "Sin fotos de Aduana disponibles.");
-        return;
+      let rows = (aduMode === "wanted") ? aduData.aduana : aduData.capitanes;
+      let idx = (aduMode === "wanted") ? aduIdx : capIdx;
+
+      if (rows.length === 0) {
+        if (aduMode === "capitanes") {
+          // Si no hay capitanes, volver a aduana
+          rows = aduData.aduana;
+          idx = aduIdx;
+        }
+        if (!rows || rows.length === 0) {
+          setBanner("adu_banner", "Sin fotos de Aduana/Capitanes disponibles.");
+          return;
+        }
       }
 
-      // Crear cards para cada pasajero (solo mostrar el activo)
-      aduRows.forEach((r, idx) => {
-        const card = document.createElement("div");
-        card.className = `wanted-card ${idx === aduCurrentIndex ? "active" : ""}`;
+      const r = rows[idx];
+      const card = document.createElement("div");
+      card.className = (aduMode === "wanted") ? "wanted-card active" : "wanted-card active captain-card";
 
-        // Header con logo y título
-        // Header con logo y título (CENTRADOS)
-        const header = document.createElement("div");
-        header.className = "wanted-header";
+      // Header
+      const header = document.createElement("div");
+      header.className = "wanted-header";
 
-        const logoIcon = document.createElement("div");
-        logoIcon.className = "wanted-logo-icon";
-        logoIcon.textContent = "🌍";
-        logoIcon.style.marginBottom = "0"; // Reset margin
-        header.appendChild(logoIcon);
+      const logoIcon = document.createElement("div");
+      logoIcon.className = "wanted-logo-icon";
+      logoIcon.textContent = (aduMode === "wanted") ? "🌍" : "👨‍✈️";
+      header.appendChild(logoIcon);
 
-        const mainTitle = document.createElement("div");
-        mainTitle.className = "wanted-main-title";
-        mainTitle.textContent = "INTERPOL WANTED";
-        header.appendChild(mainTitle);
+      const mainTitle = document.createElement("div");
+      mainTitle.className = "wanted-main-title";
+      mainTitle.textContent = (aduMode === "wanted") ? "INTERPOL WANTED" : "CAPITÁN DE MESA";
+      header.appendChild(mainTitle);
 
-        card.appendChild(header);
+      card.appendChild(header);
 
-        // Separador principal
-        const mainDivider = document.createElement("div");
-        mainDivider.className = "wanted-divider";
-        mainDivider.style.marginBottom = "20px"; // Un poco más de espacio
-        card.appendChild(mainDivider);
+      const mainDivider = document.createElement("div");
+      mainDivider.className = "wanted-divider";
+      mainDivider.style.marginBottom = "1.5vh";
+      card.appendChild(mainDivider);
 
-        // Contenido principal: foto e información
-        const content = document.createElement("div");
-        content.className = "wanted-content";
+      const content = document.createElement("div");
+      content.className = "wanted-content";
 
-        // Foto tipo pasaporte
-        const photoContainer = document.createElement("div");
-        photoContainer.className = "wanted-photo-container";
-        const photoUrl = (r["Selfie Aduana"] ?? "").toString().trim();
+      // Foto
+      const photoContainer = document.createElement("div");
+      photoContainer.className = "wanted-photo-container";
+      const photoUrl = (aduMode === "wanted") ? (r["Selfie Aduana"] ?? "") : (r["Foto"] ?? "");
 
-        if (photoUrl) {
-          const img = document.createElement("img");
-          img.className = "wanted-photo";
-          img.src = photoUrl;
-          img.loading = "lazy";
-          img.referrerPolicy = "no-referrer";
-          img.onerror = () => {
-            const ph = document.createElement("div");
-            ph.className = "wanted-photo-placeholder";
-            ph.textContent = "⚠️";
-            photoContainer.replaceChild(ph, img);
-          };
-          photoContainer.appendChild(img);
-        } else {
+      if (photoUrl && photoUrl.toString().trim() !== "") {
+        const img = document.createElement("img");
+        img.className = "wanted-photo";
+        img.src = photoUrl.toString().trim();
+        img.loading = "lazy";
+        img.referrerPolicy = "no-referrer";
+        img.onerror = () => {
           const ph = document.createElement("div");
           ph.className = "wanted-photo-placeholder";
-          ph.textContent = "—";
-          photoContainer.appendChild(ph);
-        }
-        content.appendChild(photoContainer);
+          ph.textContent = "⚠️";
+          photoContainer.replaceChild(ph, img);
+        };
+        photoContainer.appendChild(img);
+      } else {
+        const ph = document.createElement("div");
+        ph.className = "wanted-photo-placeholder";
+        ph.textContent = "—";
+        photoContainer.appendChild(ph);
+      }
+      content.appendChild(photoContainer);
 
-        // Información del pasajero
-        const info = document.createElement("div");
-        info.className = "wanted-info";
+      // Info
+      const info = document.createElement("div");
+      info.className = "wanted-info";
 
-        const nombre = (r["Pasajero"] ?? "").toString();
-        if (nombre) {
-          const nameDiv = document.createElement("div");
-          nameDiv.className = "wanted-name";
-          nameDiv.textContent = nombre.toUpperCase();
-          info.appendChild(nameDiv);
+      const nombre = (r["Pasajero"] ?? "").toString();
+      if (nombre) {
+        const nameDiv = document.createElement("div");
+        nameDiv.className = "wanted-name";
+        nameDiv.style.fontSize = "2.1vh";
+        nameDiv.textContent = nombre.toUpperCase();
+        info.appendChild(nameDiv);
 
-          const divider1 = document.createElement("div");
-          divider1.className = "wanted-divider";
-          info.appendChild(divider1);
-        }
+        const divider1 = document.createElement("div");
+        divider1.className = "wanted-divider";
+        info.appendChild(divider1);
+      }
 
-        // 1) EDAD
+      if (aduMode === "wanted") {
+        // 1) Línea de EDAD y ESTADO CIVIL
         const edad = (r["Edad"] ?? "").toString();
-        if (edad) {
+        const estado = (r["Estado Civil"] ?? "").toString();
+        if (edad || estado) {
           const rowDiv = document.createElement("div");
           rowDiv.className = "wanted-detail";
-          rowDiv.innerHTML = `<span class="wanted-detail-label">EDAD:</span> <span class="wanted-detail-value">${edad}</span>`;
+          rowDiv.style.fontSize = "1.2vh";
+          rowDiv.style.fontWeight = "400";
+          let html = "";
+          if (edad) html += `<span class="wanted-detail-label">EDAD:</span> <span class="wanted-detail-value">${edad}</span>`;
+          if (edad && estado) html += ` <span style="margin:0 10px; opacity:0.5;">|</span> `;
+          if (estado) html += `<span class="wanted-detail-label">ESTADO CIVIL:</span> <span class="wanted-detail-value">${estado.toUpperCase()}</span>`;
+          rowDiv.innerHTML = html;
           info.appendChild(rowDiv);
 
           const div = document.createElement("div");
@@ -871,25 +966,19 @@
           info.appendChild(div);
         }
 
-        // 2) VISTO EN (Random Country) -> BUSCADO EN
-        const visto = (r["En"] ?? "").toString();
-        if (visto) {
-          const rowDiv = document.createElement("div");
-          rowDiv.className = "wanted-detail";
-          rowDiv.innerHTML = `<span class="wanted-detail-label">BUSCADO EN:</span> <span class="wanted-detail-value">${visto}</span>`;
-          info.appendChild(rowDiv);
-
-          const div = document.createElement("div");
-          div.className = "wanted-divider";
-          info.appendChild(div);
-        }
-
-        // 3) PELIGROSIDAD
+        // 2) Línea de PELIGROSIDAD y BUSCADO EN
         const peli = (r["Peligrosidad"] ?? "").toString();
-        if (peli) {
+        const en = (r["En"] ?? "").toString();
+        if (peli || en) {
           const rowDiv = document.createElement("div");
           rowDiv.className = "wanted-detail";
-          rowDiv.innerHTML = `<span class="wanted-detail-label">PELIGROSIDAD:</span> <span class="wanted-detail-value">${peli}</span>`;
+          rowDiv.style.fontSize = "1.2vh";
+          rowDiv.style.fontWeight = "400";
+          let html = "";
+          if (peli) html += `<span class="wanted-detail-label">PELIGROSIDAD:</span> <span class="wanted-detail-value">${peli}</span>`;
+          if (peli && en) html += ` <span style="margin:0 10px; opacity:0.5;">|</span> `;
+          if (en) html += `<span class="wanted-detail-label">BUSCADO EN:</span> <span class="wanted-detail-value">${en.toUpperCase()}</span>`;
+          rowDiv.innerHTML = html;
           info.appendChild(rowDiv);
 
           const div = document.createElement("div");
@@ -897,34 +986,80 @@
           info.appendChild(div);
         }
 
-        // 4) MOTIVO (al final)
+        // 3) MOTIVO (Solo y Grande)
         const por = (r["Por"] ?? "").toString();
         if (por) {
           const rowDiv = document.createElement("div");
           rowDiv.className = "wanted-detail";
+          rowDiv.style.fontSize = "1.8vh";
+          rowDiv.style.fontWeight = "900";
           rowDiv.innerHTML = `<span class="wanted-detail-label">MOTIVO:</span> <span class="wanted-detail-value">${por}</span>`;
           info.appendChild(rowDiv);
+
+          const div = document.createElement("div");
+          div.className = "wanted-divider";
+          info.appendChild(div);
         }
+      }
+      else {
+        // Texto de Capitán
+        const capText = document.createElement("div");
+        capText.className = "wanted-detail";
+        capText.style.fontSize = "1.2vh";
+        capText.style.lineHeight = "1.4";
+        capText.style.textAlign = "justify";
+        capText.innerHTML = `La ADUANA ha detectado que esta persona ha sido seleccionada por los controles aduaneros, y deberá seguir las instrucciones de la tripulación en el video inicial que será presentado en el salón principal.`;
+        info.appendChild(capText);
 
-        content.appendChild(info);
-        card.appendChild(content);
+        if (r["Mesa"]) {
+          const mesaDiv = document.createElement("div");
+          mesaDiv.style.marginTop = "1vh";
+          mesaDiv.style.fontWeight = "900";
+          mesaDiv.textContent = `MESA ASIGNADA: ${r["Mesa"]}`;
+          info.appendChild(mesaDiv);
+        }
+      }
 
-        // Footer genérico (fuera del content)
-        const footer = document.createElement("div");
-        footer.className = "wanted-footer";
-        footer.textContent = "SI TIENE ALGUNA INFORMACIÓN SOBRE ESTA PERSONA, POR FAVOR CONTACTE A SU POLICÍA LOCAL O A INTERPOL.";
-        card.appendChild(footer);
+      content.appendChild(info);
+      card.appendChild(content);
 
-        container.appendChild(card);
-      });
+      const footer = document.createElement("div");
+      footer.className = "wanted-footer";
+      footer.textContent = (aduMode === "wanted")
+        ? "SI TIENE ALGUNA INFORMACIÓN SOBRE ESTA PERSONA, POR FAVOR CONTACTE A SU POLICÍA LOCAL O A INTERPOL."
+        : "PERSONAL AUTORIZADO - TRIPULACIÓN DE CABINA";
+      card.appendChild(footer);
 
-      document.getElementById("adu_kpi").textContent = aduRows.length ? `TOTAL ${aduRows.length}` : "PENDIENTE";
-      setBanner("adu_banner", aduRows.length ? "OK ✅" : "Sin fotos de Aduana.");
+      // ✅ Contador de posición (ej: 1 / 27)
+      if (rows.length > 0) {
+        const counter = document.createElement("div");
+        counter.style.position = "absolute";
+        counter.style.bottom = "8px";
+        counter.style.right = "12px";
+        counter.style.fontSize = "1vh";
+        counter.style.opacity = "0.6";
+        counter.style.fontWeight = "900";
+        counter.textContent = `${idx + 1} / ${rows.length}`;
+        card.appendChild(counter);
+      }
+
+      container.appendChild(card);
+
+      // Update KPI
+      document.getElementById("adu_kpi").textContent = (aduMode === "wanted")
+        ? `WANTED: ${aduData.aduana.length}`
+        : `CAPITANES: ${aduData.capitanes.length}`;
+      setBanner("adu_banner", rows.length ? "OK ✅" : "Sin fotos de Aduana/Capitanes.");
     }
 
     function rotateAduana() {
-      if (aduRows.length === 0) return;
-      aduCurrentIndex = (aduCurrentIndex + 1) % aduRows.length;
+      if (aduMode === "wanted") {
+        if (aduData.aduana.length === 0) return;
+        aduIdx = (aduIdx + 1) % aduData.aduana.length;
+      } else {
+        if (aduData.capitanes.length === 0) return;
+        capIdx = (capIdx + 1) % aduData.capitanes.length;
+      }
       renderAduana();
     }
 
@@ -934,16 +1069,12 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
 
-        aduRows = asArray(json.rows ?? []);
-        aduRotateSeconds = json.rotate_seconds || 5;
-
-        // Resetear índice si cambió la lista
-        if (aduCurrentIndex >= aduRows.length) {
-          aduCurrentIndex = 0;
-        }
+        aduData.aduana = asArray(json.aduana ?? []);
+        aduData.capitanes = asArray(json.capitanes ?? []);
 
         renderAduana();
       } catch (e) {
+        console.error("Error fetching aduana/capitanes:", e);
         setBanner("adu_banner", "Error /data/aduana:\n" + e, true);
       }
     }
@@ -971,17 +1102,14 @@
 
     // Start loops
     fetchPassengers();
-    fetchEvents();
     fetchMetrics();
     fetchAduana();
 
     setInterval(fetchPassengers, 5000);
-    setInterval(fetchEvents, 5000);
     setInterval(fetchMetrics, 4000);  // refresca seguido; el backend rota cada 12s
     setInterval(fetchAduana, 7000);
 
     setInterval(rotatePassengers, 5000);
-    setInterval(rotateEvents, 6000);
     setInterval(rotateAduana, 5000);  // rota cada 5 segundos
   </script>
 </body>

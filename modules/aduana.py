@@ -14,47 +14,78 @@ def build_aduana_payload(df: pd.DataFrame, rotate_seconds: int = 5) -> Dict[str,
     
     df = df.copy()
     df.columns = [c.strip() for c in df.columns]
-    print(f"DEBUG ADUANA COLS: {df.columns.tolist()}")
-    
-    # Columnas esperadas
-    # Agregamos Pais, Peligrosidad, Codigo (según debug names)
-    expected_columns = ["Pasajero", "Selfie Aduana", "Checkin", "Hora", "Mesa", "Edad", "Buscado", "Pais Buscado", "Peligrosidad", "Codigo Delito"]
-    for col in expected_columns:
-        if col not in df.columns:
-            df[col] = ""
-    
-    # Filtrar solo los que tienen foto de Aduana
+    # 1) ADUANA: Filtrar por Selfie
     df["Selfie Aduana"] = df["Selfie Aduana"].astype(str).str.strip()
-    # Filtrar solo links validos (contienen http)
-    df_filtered = df[df["Selfie Aduana"].str.contains("http", case=False, na=False)].copy()
+    df_aduana = df[df["Selfie Aduana"].str.contains("http", case=False, na=False)].copy()
     
-    if df_filtered.empty:
-        return {"rows": [], "rotate_seconds": rotate_seconds}
+    # Column detection (accent robust)
+    import unicodedata
+    def normalize_str(s):
+        s = s.lower().strip()
+        return "".join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
+
+    norm_cols = {normalize_str(c): c for c in df.columns}
     
-    # Helper para formatear edad
+    def get_col(candidates):
+        for cand in candidates:
+            norm_cand = normalize_str(cand)
+            if norm_cand in norm_cols:
+                return norm_cols[norm_cand]
+        return None
+
+    cap_col = get_col(["Capitan", "Capitán", "Captain"]) or "Capitán"
+    
+    # Prioridad: Foto Capitán de Mesa -> Foto Capitán -> Selfie Aduana
+    photo_cap_col = get_col(["Foto Capitan de Mesa", "Foto Capitán de Mesa", "Foto Capitan", "Foto Capitán"])
+    if not photo_cap_col:
+        photo_cap_col = get_col(["Selfie Aduana", "Foto"]) or "Selfie Aduana"
+    
+    if cap_col in df.columns:
+        df_cap = df[df[cap_col].astype(str).str.upper() == "X"].copy()
+    else:
+        df_cap = pd.DataFrame()
+    
     def fmt_age(val):
         try:
             return str(int(float(val)))
         except:
             return str(val)
 
-    # Preparar datos
-    rows = []
-    for _, row in df_filtered.iterrows():
-        rows.append({
-            "Pasajero": row.get("Pasajero", ""),
-            "Selfie Aduana": row.get("Selfie Aduana", ""),
+    def clean_val(val):
+        if pd.isna(val) or str(val).lower() == "nan": return ""
+        return str(val).strip()
+
+    # Preparar datos Aduana
+    aduana_rows = []
+    for _, row in df_aduana.iterrows():
+        aduana_rows.append({
+            "Pasajero": clean_val(row.get("Pasajero", "")),
+            "Selfie Aduana": clean_val(row.get("Selfie Aduana", "")),
             "Edad": fmt_age(row.get("Edad", "")),
-            "En": str(row.get("Pais Buscado", "")).upper(), # Corrected column name
-            "Por": str(row.get("Buscado", "")),
-            "Peligrosidad": str(row.get("Peligrosidad", "")),
-            "Codigo": str(row.get("Codigo Delito", "")), # Corrected column name
-            "Checkin": row.get("Checkin", ""),
-            "Hora": row.get("Hora", ""),
-            "Mesa": row.get("Mesa", ""),
+            "Estado Civil": clean_val(row.get("Estado Civil", "")).upper(),
+            "Peligrosidad": clean_val(row.get("Peligrosidad", "")),
+            "En": clean_val(row.get("Buscado en:", "")).upper(),
+            "Por": clean_val(row.get("Buscado", "")),
         })
 
+    # Preparar datos Capitanes
+    capitanes_rows = []
+    for _, row in df_cap.iterrows():
+        pasajero_val = clean_val(row.get("Pasajero", ""))
+        if not pasajero_val: continue
+        
+        capitanes_rows.append({
+            "Pasajero": pasajero_val,
+            "Foto": clean_val(row.get(photo_cap_col, "")),
+            "Mesa": clean_val(row.get("Mesa", "")),
+        })
+
+    # Ordenar alfabéticamente por Pasajero
+    aduana_rows.sort(key=lambda x: x["Pasajero"].upper())
+    capitanes_rows.sort(key=lambda x: x["Pasajero"].upper())
+
     return {
-        "rows": rows,
+        "aduana": aduana_rows,
+        "capitanes": capitanes_rows,
         "rotate_seconds": rotate_seconds
     }
