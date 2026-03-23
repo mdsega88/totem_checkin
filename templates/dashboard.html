@@ -842,18 +842,15 @@
     let aduIdx = 0;
     let capIdx = 0;
 
-    function switchAduanaMode() {
-      if (aduMode === "wanted" && aduData.capitanes.length > 0) {
+    function startCapitanesPass() {
+      if (aduMode !== "capitanes" && aduData.capitanes.length > 0) {
         aduMode = "capitanes";
-      } else {
-        aduMode = "wanted";
+        capIdx = 0; // Iniciar pasada desde el primero
+        renderAduana();
       }
-      aduIdx = 0;
-      capIdx = 0;
-      renderAduana();
     }
-    // Rotar modo cada 30 segundos
-    setInterval(switchAduanaMode, 30000);
+    // Iniciar pasada de capitanes cada 1 minuto (60 segundos)
+    setInterval(startCapitanesPass, 60000);
 
     function renderAduana() {
       const container = document.getElementById("adu_container");
@@ -1058,7 +1055,15 @@
         aduIdx = (aduIdx + 1) % aduData.aduana.length;
       } else {
         if (aduData.capitanes.length === 0) return;
-        capIdx = (capIdx + 1) % aduData.capitanes.length;
+        capIdx++;
+        if (capIdx >= aduData.capitanes.length) {
+          // Finalizó la pasada de capitanes, volver a INTERPOL
+          capIdx = 0;
+          aduMode = "wanted";
+          if (aduData.aduana.length > 0) {
+            aduIdx = (aduIdx + 1) % aduData.aduana.length;
+          }
+        }
       }
       renderAduana();
     }
