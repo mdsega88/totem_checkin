@@ -846,11 +846,17 @@
     let aduIdx = 0;
     let capIdx = 0;
 
+    let aduRotateTimer;
+
     function startCapitanesPass() {
       if (aduMode !== "capitanes" && aduData.capitanes.length > 0) {
         aduMode = "capitanes";
         capIdx = 0; // Iniciar pasada desde el primero
         renderAduana();
+        
+        // Reiniciar timer para que el capitan 1 dure los 5 segundos completos
+        if (aduRotateTimer) clearInterval(aduRotateTimer);
+        aduRotateTimer = setInterval(rotateAduana, 5000);
       }
     }
     // Iniciar pasada de capitanes cada 1 minuto (60 segundos)
@@ -1130,7 +1136,7 @@
     setInterval(fetchAduana, 7000);
 
     setInterval(rotatePassengers, 5000);
-    setInterval(rotateAduana, 5000);  // rota cada 5 segundos
+    aduRotateTimer = setInterval(rotateAduana, 5000);  // rota cada 5 segundos
   </script>
 </body>
 
