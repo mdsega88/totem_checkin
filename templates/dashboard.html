@@ -988,9 +988,17 @@
         if (por) {
           const rowDiv = document.createElement("div");
           rowDiv.className = "wanted-detail";
-          rowDiv.style.fontSize = "1.8vh";
+          
+          let fSize = 1.8;
+          if (por.length > 120) fSize = 1.0;
+          else if (por.length > 80) fSize = 1.2;
+          else if (por.length > 50) fSize = 1.4;
+          else if (por.length > 30) fSize = 1.6;
+
+          rowDiv.style.fontSize = fSize + "vh";
           rowDiv.style.fontWeight = "900";
-          rowDiv.innerHTML = `<span class="wanted-detail-label">MOTIVO:</span> <span class="wanted-detail-value">${por}</span>`;
+          rowDiv.style.lineHeight = "1.2";
+          rowDiv.innerHTML = `<span class="wanted-detail-label">MOTIVO:</span> <span class="wanted-detail-value" style="word-wrap: break-word; white-space: normal;">${por}</span>`;
           info.appendChild(rowDiv);
 
           const div = document.createElement("div");
