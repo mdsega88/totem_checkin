@@ -454,6 +454,8 @@
       gap: 25px;
       align-items: flex-start;
       flex: 1;
+      min-width: 0;
+      min-height: 0;
     }
 
     .wanted-photo-container {
@@ -484,6 +486,8 @@
     .wanted-info {
       flex: 1;
       color: #fff;
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
 
     .wanted-name {
@@ -984,25 +988,28 @@
         }
 
         // 3) MOTIVO (Solo y Grande)
-        const por = (r["Por"] ?? "").toString();
+        const por = (r["Por"] ?? "").toString().trim();
         if (por) {
           const rowDiv = document.createElement("div");
           rowDiv.className = "wanted-detail";
-          
+          rowDiv.style.margin = "2px 0"; // Reducir margen para ahorrar espacio vertical
+
           let fSize = 1.8;
-          if (por.length > 120) fSize = 1.0;
-          else if (por.length > 80) fSize = 1.2;
+          if (por.length > 150) fSize = 0.9;
+          else if (por.length > 100) fSize = 1.0;
+          else if (por.length > 70) fSize = 1.2;
           else if (por.length > 50) fSize = 1.4;
           else if (por.length > 30) fSize = 1.6;
 
           rowDiv.style.fontSize = fSize + "vh";
           rowDiv.style.fontWeight = "900";
-          rowDiv.style.lineHeight = "1.2";
-          rowDiv.innerHTML = `<span class="wanted-detail-label">MOTIVO:</span> <span class="wanted-detail-value" style="word-wrap: break-word; white-space: normal;">${por}</span>`;
+          rowDiv.style.lineHeight = "1.1";
+          rowDiv.innerHTML = `<span class="wanted-detail-label">MOTIVO:</span> <span class="wanted-detail-value" style="word-wrap: break-word; white-space: normal; display: inline-block; max-width: 100%;">${por}</span>`;
           info.appendChild(rowDiv);
 
           const div = document.createElement("div");
           div.className = "wanted-divider";
+          div.style.margin = "4px 0";
           info.appendChild(div);
         }
       }
